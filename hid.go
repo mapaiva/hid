@@ -70,6 +70,7 @@ func FindDevicesByProduct(product string) <-chan *DeviceInfo {
 				result <- dev
 			}
 		}
+		close(result)
 	}()
 
 	return result
