@@ -3,7 +3,10 @@
 // Signal 11 - HIDAPI. (https://github.com/signal11/hidapi)
 package hid
 
-import "strings"
+import (
+	"strings"
+	"fmt"
+)
 
 // DeviceInfo provides general information about a device
 type DeviceInfo struct {
@@ -23,6 +26,10 @@ type DeviceInfo struct {
 	InputReportLength   uint16
 	OutputReportLength  uint16
 	FeatureReportLength uint16
+}
+
+func (deviceInfo DeviceInfo) String() string {
+	return fmt.Sprintf("Product: %v\nPath: %v\nVendorId: %v\nProductId: %v\n", deviceInfo.Product, deviceInfo.Path, deviceInfo.VendorId, deviceInfo.ProductId)
 }
 
 // Device interface for an opened HID USB device
@@ -53,7 +60,7 @@ func FindDevices(vendor uint16, product uint16) <-chan *DeviceInfo {
 	return result
 }
 
-// FindDevicesByProduct iterates through all devices with a given vendor and product id
+// FindDevicesByProduct iterates through all devices with a given product
 func FindDevicesByProduct(product string) <-chan *DeviceInfo {
 	result := make(chan *DeviceInfo)
 
@@ -66,4 +73,13 @@ func FindDevicesByProduct(product string) <-chan *DeviceInfo {
 	}()
 
 	return result
+}
+
+// Print all available devices
+func ListDevices() {
+	go func() {
+		for dev := range Devices() {
+			fmt.Println(dev)
+		}
+	}()
 }
